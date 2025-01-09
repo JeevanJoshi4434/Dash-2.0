@@ -7,7 +7,6 @@ import connectDB from './db/mongoDB';
 
 // Load environment variables
 dotenv.config();
-
 class App {
   public app: Application;
   private port: number;

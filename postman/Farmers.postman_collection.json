@@ -1,0 +1,307 @@
+{
+	"info": {
+		"_postman_id": "0902283d-811b-4f0b-8abb-996093053f5e",
+		"name": "Farmer",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21682225"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Get User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{user_url}}",
+							"host": [
+								"{{user_url}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"John Doe\",\r\n    \"email\":\"johnDoe2@mail.com\",\r\n    \"password\":\"Dash@1234\",\r\n    \"type\":\"farmer\",\r\n    \"location\": {\r\n    \"type\": \"Point\",\r\n    \"coordinates\": [72.898674, 19.097271]   // Longitude, Latitude\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{user_url}}",
+							"host": [
+								"{{user_url}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"johnDoe@mail.com\",\r\n    \"password\":\"LoveIt@3\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{user_url}}/login",
+							"host": [
+								"{{user_url}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find Farmers",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{user_url}}/farmers",
+							"host": [
+								"{{user_url}}"
+							],
+							"path": [
+								"farmers"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Stock",
+			"item": [
+				{
+					"name": "Get Stocks",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{stock_url}}/",
+							"host": [
+								"{{stock_url}}"
+							],
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Stocks - Available",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{stock_url}}?type=available",
+							"host": [
+								"{{stock_url}}"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "available"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Stocks - Unavailable",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{stock_url}}?type=unavailable",
+							"host": [
+								"{{stock_url}}"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "unavailable"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Stocks - Near",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{stock_url}}?type=near&limit=10&page=1",
+							"host": [
+								"{{stock_url}}"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "near"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Stock",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"Corn\", \r\n    \"quantity\":100, \r\n    \"price\":10.92, \r\n    \"description\":\"A pure yellow Corn from Uttarakhand's ground\", \r\n    \"category\":\"Corn\", \r\n    \"location\": {\r\n    \"type\": \"Point\",\r\n    \"coordinates\": [72.898674, 19.097271]   // Longitude, Latitude\r\n  } \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{stock_url}}/",
+							"host": [
+								"{{stock_url}}"
+							],
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "id",
+			"value": "1"
+		},
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000/api"
+		},
+		{
+			"key": "user_url",
+			"value": "http://localhost:3000/api/user",
+			"type": "string"
+		},
+		{
+			"key": "stock_url",
+			"value": "http://localhost:3000/api/stock",
+			"type": "string"
+		},
+		{
+			"key": "payment_url",
+			"value": "http://localhost:3000/api/payment",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3N2ZlYmM1MzEzMDk4ZTBlZDcwZmI4OSIsImVtYWlsIjoiam9obkRvZUBtYWlsLmNvbSIsImlhdCI6MTczNjQ0MDA1NywiZXhwIjoxNzM2NDUwODU3fQ.A5GC31poLVmeqeprGAJTSMej4ykjqq_h05tV_HcGU2s",
+			"type": "string"
+		}
+	]
+}

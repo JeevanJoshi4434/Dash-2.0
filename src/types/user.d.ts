@@ -5,13 +5,15 @@ type StocksId = string;
 type SALT = number | string;
 
 interface Location {
-  latitude: number;
-  longitude: number;
+  type: string;
+  coordinates: number[];
 }
+
 
 type UserValidFields = 'id' | 'name' | 'email' | 'password' | 'type' | 'location' | 'lastActive' | 'stocks' | 'payments';
 
 interface BaseUser {
+  _id: string;
   name: string;
   email: string;
   password: string;

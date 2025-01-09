@@ -83,6 +83,10 @@ npm test
 
 Ensure that you have set up the testing environment and any necessary services.
 
+### Step 6: Setup postman apis (Optional for development purposes)
+
+To setup postman apis for development purposes, you can use posman exported file `Farmers.postman_collection.json`.
+
 ---
 
 ## API Documentation

@@ -2,13 +2,24 @@ import { Schema, Model, model } from 'mongoose';
 import { IUser, Location, SALT, UserType, UserValidFields } from '../types/user';
 import bcrypt from 'bcryptjs';  // For password hashing
 
+
 const userSchema: Schema<IUser> = new Schema(
-    {
+    { 
         name: { type: String, required: true },
         email: { type: String, required: true, unique: true },
         password: { type: String, required: true },
         type: { type: String, required: true, enum: ['farmer', 'buyer', 'admin'] },
-        location: { type: Object, required: true },  // Assuming location is an object with lat/long
+        location: { 
+            type: { 
+                type: String, 
+                enum: ['Point'],
+                required: true 
+            },
+            coordinates: { 
+                type: [Number],
+                required: true
+            }
+        },  // Assuming location is an object with lat/long
         lastActive: { type: Date, required: true, default: new Date() },
         stocks: [{ type: Schema.Types.ObjectId, ref: 'Stock' }],
         payments: [{ type: String }],
@@ -16,9 +27,12 @@ const userSchema: Schema<IUser> = new Schema(
     { timestamps: true }
 );
 
+userSchema.index({ location: '2dsphere' });
+
+
 // Encrypt password before saving (for security in production)
 userSchema.pre<IUser>('save', async function (next) {
-    const hashedPassword = await bcrypt.hash(this.password, 10);  // Adjust the salt rounds as necessary
+    const hashedPassword = await bcrypt.hash(this.password, 10); 
     this.password = hashedPassword;
     next();
 });
@@ -91,8 +105,7 @@ class User {
     }
 
     // Validate user password
-    public async validatePassword(userId: string, inputPassword: string): Promise<boolean> {
-        const user = await this.userModel.findOne({ _id: userId }).exec();
+    public async validatePassword(user: IUser, inputPassword: string): Promise<boolean> {
         if (user) {
             return bcrypt.compare(inputPassword, user.password);  // Use bcrypt to compare hashed passwords
         }
