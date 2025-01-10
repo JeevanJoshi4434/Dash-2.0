@@ -8,7 +8,9 @@ const stockSchema: Schema<STK> = new Schema(
         quantity: { type: Number, required: true },
         userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
         category: { type: String, required: true },
+        bidders: [{ type: Schema.Types.ObjectId, ref: "User" }],
         description: { type: String, required: true },
+        img: [],
         location: {
             type: {
                 type: String,
@@ -20,6 +22,11 @@ const stockSchema: Schema<STK> = new Schema(
                 required: true
             }
         },
+        active: { type: Boolean, default: true },
+        currentBidder: {
+            type: Object,
+            default: null
+        }
     },
     { timestamps: true }
 )

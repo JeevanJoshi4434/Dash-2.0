@@ -3,9 +3,12 @@ import { globalErrorHandler } from "../utils/errorHandler";
 import * as JWT from 'jsonwebtoken';
 import { UserRequest } from "../types/express";
 import Stock, { StockModel } from "../models/stock";
-import User from "../models/user";
+import User, { UserModel } from "../models/user";
 import { Location } from "../types/user";
 import { ReturnStocks, SplitterStocks } from "../types/types";
+import path from "path";
+import fs from 'fs';
+import multer from "multer";
 const { validationResult } = require('express-validator');
 
 
@@ -14,6 +17,12 @@ class StockController extends Stock {
     constructor() {
         super();
         this.userService = new User();
+
+        const dir = path.join(__dirname, '../images/stock');
+
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
     }
 
     async create(req: UserRequest, res: Response): Promise<Response | void> {
@@ -132,6 +141,136 @@ class StockController extends Stock {
                 .skip((pageNumber - 1) * limitNumber).exec(); // Skip for pagination
 
             return res.status(200).json({ stocks });
+        } catch (error) {
+            globalErrorHandler(error, res);
+        }
+    }
+
+
+    private upload = multer({
+        storage: multer.diskStorage({
+            destination: (req, file, cb) => {
+                const dir = path.join(__dirname, '../images/stck');
+                cb(null, dir);
+            },
+            filename: (req, file, cb) => {
+                const date = new Date();
+                const timestamp = date.toISOString().replace(/[:.]/g, '-');
+                const ext = path.extname(file.originalname);
+                const name = `${file.fieldname}-${timestamp}${ext}`;
+                cb(null, name);
+            }
+        })
+    }).array('images', 10); // Allow up to 10 images
+
+    async uploadImages(req: UserRequest, res: Response): Promise<Response | void> {
+        try {
+            // Handle file upload
+            this.upload(req, res, async (err: any) => {
+                if (err) {
+                    return res.status(400).json({ error: 'File upload failed', details: err.message });
+                }
+
+                // Ensure files are present
+                if (!req.files || req.files.length === 0) {
+                    return res.status(400).json({ error: 'No files uploaded' });
+                }
+
+                // Extract file paths
+                const uploadedFiles = (req.files as Express.Multer.File[]).map(file => {
+                    const relativePath = path.relative(path.join(__dirname, '../'), file.path);
+                    return relativePath.replace(/\\/g, '/'); // Convert Windows-style paths to URL-friendly paths
+                });
+
+                // Update the stock document with the image paths
+                const stock = await StockModel.findByIdAndUpdate(
+                    req.params.id,
+                    { $push: { images: { $each: uploadedFiles } } }, // Push multiple images into the array
+                    { new: true } // Return the updated document
+                ).exec();
+
+                // Check if stock exists
+                if (!stock) {
+                    return res.status(404).json({ error: 'Stock not found' });
+                }
+
+                // Respond with the updated stock
+                return res.status(200).json({ message: 'Images uploaded and stock updated successfully', stock });
+            });
+        } catch (error) {
+            globalErrorHandler(error, res);
+        }
+    }
+
+    async placeBid(req: UserRequest, res: Response): Promise<Response | void> {
+        try {
+            const { stockId, bidAmount } = req.body;
+    
+            // Find the stock
+            const stock = await StockModel.findById(stockId).exec();
+            if (!stock) {
+                return res.status(400).json({ error: 'Stock not found' });
+            }
+    
+            // Validate the bidAmount
+            if (bidAmount <= stock.price) {
+                return res.status(400).json({ error: 'Bid must be higher than the current price' });
+            }
+    
+            // Retrieve previous amount if the user already placed a bid
+            let prevAmount = 0;
+            const bidderIndex = stock.bidders.findIndex(e => e.split('--')[0] === req.user.id);
+    
+            if (bidderIndex !== -1) {
+                prevAmount = parseFloat(stock.bidders[bidderIndex].split('--')[1]);
+                stock.bidders.splice(bidderIndex, 1); // Remove the user from the bidders list
+            }
+    
+            // Update the user's balance
+            const user = await this.userService.updateBalance(req.user.id, bidAmount - prevAmount);
+            if (!user || user.balance === undefined) {
+                return res.status(400).json({ error: 'User not found or balance not available' });
+            }
+    
+            // Add the user to bidders and set as the current bidder
+            const userString = `${req.user.id}--${bidAmount}`;
+            stock.bidders.push(userString);
+    
+            // Remove sensitive or unnecessary properties conditionally
+            const userResponse: Partial<typeof user> = { ...user }; // Create a shallow copy
+            if ('password' in userResponse) delete userResponse.password;
+            if ('type' in userResponse) delete userResponse.type;
+    
+            stock.currentBidder = userResponse;
+    
+            // Update the stock price and save
+            stock.price = bidAmount;
+            await stock.save();
+    
+            return res.status(200).json({ success: true, stock, user });
+        } catch (error) {
+            globalErrorHandler(error, res);
+        }
+    }
+    
+
+
+
+    async closeBids(req: UserRequest, res: Response): Promise<Response | void> {
+        try {
+            const { stockId } = req.query;
+            const stock = await StockModel.findByIdAndUpdate(stockId, { active: false }, { new: true });
+            return res.status(200).json({ success: true });
+        } catch (error) {
+            globalErrorHandler(error, res);
+        }
+    }
+
+    async getCurrentBid(req: UserRequest, res: Response): Promise<Response | void> {
+        try {
+            const { stockId } = req.query;
+            const stock = await this.findStockById(stockId as string);
+            return res.status(200).json({ success: true, price: stock?.price });
         } catch (error) {
             globalErrorHandler(error, res);
         }

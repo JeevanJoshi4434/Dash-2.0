@@ -23,6 +23,7 @@ const userSchema: Schema<IUser> = new Schema(
         lastActive: { type: Date, required: true, default: new Date() },
         stocks: [{ type: Schema.Types.ObjectId, ref: 'Stock' }],
         payments: [{ type: String }],
+        balance: { type: Number, default: 1500 },
     },
     { timestamps: true }
 );
@@ -90,6 +91,14 @@ class User {
         return this.userModel.findOneAndUpdate(
             { _id: userId },
             { password: newPassword },
+            { new: true }
+        ).exec();
+    }
+
+    public async updateBalance(userId: string, bid: number): Promise<IUser | null> {
+        return this.userModel.findOneAndUpdate(
+            { _id: userId },
+            { $inc: { balance: -bid } },
             { new: true }
         ).exec();
     }

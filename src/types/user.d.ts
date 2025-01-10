@@ -28,6 +28,7 @@ interface Farmer extends BaseUser {
   type: 'farmer';
   stocks: StocksId[]; // Farmers must have stocks
   payments?: never; // Farmers shouldn't have payments
+  balance?: never;
 }
 
 // Buyer user interface
@@ -35,6 +36,7 @@ interface Buyer extends BaseUser {
   type: 'buyer';
   stocks?: never; // Buyers shouldn't have stocks
   payments: string[]; // Buyers must have payments
+  balance: number;
 }
 
 // Admin user interface
@@ -42,6 +44,7 @@ interface Admin extends BaseUser {
   type: 'admin';
   stocks?: never; // Admins shouldn't have stocks
   payments?: never; // Admins shouldn't have payments
+  balance?: never;
 }
 
 // Union type for all user types

@@ -276,6 +276,194 @@ If no `type` is provided (default to retrieving all stocks):
 
 ---
 
+# Bid APIs
+
+## Get Current Bid
+
+### Endpoint: `/api/bid`
+
+#### Method: `GET`
+
+#### Request Headers:
+
+- **Authorization**: `Bearer <token>` (Token generated during user login)
+- **Content-Type**: `application/json`
+
+#### Response:
+
+##### Success (200):
+
+```json
+{
+  "currentBid": {
+    "stockId": "12345",
+    "price": 500,
+    "currentBidder": {
+      "_id": "userId123",
+      "name": "John Doe"
+    },
+    "bidders": [
+      {
+        "_id": "userId123",
+        "name": "John Doe"
+      },
+      {
+        "_id": "userId456",
+        "name": "Jane Smith"
+      }
+    ]
+  }
+}
+```
+
+##### Error (400 / 500):
+
+```json
+{
+  "error": "Unable to fetch the current bid"
+}
+```
+
+---
+
+## Place a Bid
+
+### Endpoint: `/api/bid`
+
+#### Method: `PUT`
+
+#### Request Headers:
+
+- **Authorization**: `Bearer <token>` (Token generated during user login)
+- **Content-Type**: `application/json`
+
+#### Request Body:
+
+```json
+{
+  "id": "12345",
+  "bid": 600
+}
+```
+
+#### Response:
+
+##### Success (200):
+
+```json
+{
+  "success": true,
+  "stock": {
+    "_id": "12345",
+    "price": 600,
+    "currentBidder": {
+      "_id": "userId123",
+      "name": "John Doe"
+    },
+    "bidders": [
+      {
+        "_id": "userId123",
+        "name": "John Doe"
+      },
+      {
+        "_id": "userId456",
+        "name": "Jane Smith"
+      }
+    ]
+  }
+}
+```
+
+##### Error (400):
+
+```json
+{
+  "error": "Bid must be higher than the current price"
+}
+```
+
+##### Error (404):
+
+```json
+{
+  "error": "Stock not found"
+}
+```
+
+##### Error (500):
+
+```json
+{
+  "error": "Failed to place a bid"
+}
+```
+
+---
+
+## Close Bids
+
+### Endpoint: `/api/bid`
+
+#### Method: `PATCH`
+
+#### Request Headers:
+
+- **Authorization**: `Bearer <token>` (Token generated during user login)
+- **Content-Type**: `application/json`
+
+#### Request Body:
+
+```json
+{
+  "id": "12345"
+}
+```
+
+#### Response:
+
+##### Success (200):
+
+```json
+{
+  "success": true,
+  "message": "Bids closed successfully",
+  "stock": {
+    "_id": "12345",
+    "price": 600,
+    "winner": {
+      "_id": "userId123",
+      "name": "John Doe"
+    }
+  }
+}
+```
+
+##### Error (400):
+
+```json
+{
+  "error": "Cannot close bids for this stock"
+}
+```
+
+##### Error (404):
+
+```json
+{
+  "error": "Stock not found"
+}
+```
+
+##### Error (500):
+
+```json
+{
+  "error": "Failed to close bids"
+}
+```
+
+---
+
 ### Contributers
 
 - [Jeevan Joshi](https://github.com/jeevanjoshi4434)

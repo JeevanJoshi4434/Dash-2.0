@@ -1,8 +1,8 @@
 {
 	"info": {
 		"_postman_id": "0902283d-811b-4f0b-8abb-996093053f5e",
-		"name": "Farmer",
-		"description": "",
+		"name": "FarmersIn",
+		"description": "**Farmer's APIs are Listed Below**\n\n- Stock is for Getting Stock information.\n    \n- User is for User related actions.\n    \n- Bid Actions is for placcing bids.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "21682225"
 	},
@@ -246,6 +246,117 @@
 							],
 							"path": [
 								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Images",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "images",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{stock_url}}/image/:id",
+							"host": [
+								"{{stock_url}}"
+							],
+							"path": [
+								"image",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Bid Actions",
+			"item": [
+				{
+					"name": "Get Stock Bid Amount",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{stock_url}}/bid?stockId=01",
+							"host": [
+								"{{stock_url}}"
+							],
+							"path": [
+								"bid"
+							],
+							"query": [
+								{
+									"key": "stockId",
+									"value": "01"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Place Bid Amount",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"stockId\":\"01\", \"bidAmount\":111 \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{stock_url}}/bid",
+							"host": [
+								"{{stock_url}}"
+							],
+							"path": [
+								"bid"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Close Bidding",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{stock_url}}/bid?stockId=01",
+							"host": [
+								"{{stock_url}}"
+							],
+							"path": [
+								"bid"
+							],
+							"query": [
+								{
+									"key": "stockId",
+									"value": "01"
+								}
 							]
 						}
 					},

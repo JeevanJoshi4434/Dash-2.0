@@ -12,6 +12,10 @@ export interface Stock {
     category: string;
     description: string;
     location: Location;
+    img: string[];
+    active: true;
+    bidders: string[];
+    currentBidder: Object;
 }
 
 export interface Payment{

@@ -28,10 +28,25 @@ router.get('/', authenticator, (req: Request, res: Response) => {
     }
 });
 
+router.put('/image/:id', authenticator, (req: Request, res: Response) => {
+    stock.uploadImages(req, res).catch((error: any) => globalErrorHandler(error, res));
+})
+
+
 //POST Request to create a stock
 router.post('/', authenticator, (req: Request, res: Response) => {
     stock.create(req, res).catch((error: any) => globalErrorHandler(error, res));
 });
 
+
+// GET, PUT, DELETE Bid on a stock Routes
+
+router.get('/bid', authenticator, (req: Request, res: Response) => {
+    stock.getCurrentBid(req, res).catch((error: any) => globalErrorHandler(error, res));
+}).put('/bid', authenticator, (req: Request, res: Response) => {
+    stock.placeBid(req, res).catch((error: any) => globalErrorHandler(error, res));
+}).patch('/bid', authenticator, (req: Request, res: Response) => {
+    stock.closeBids(req, res).catch((error: any) => globalErrorHandler(error, res));
+})
 
 export default router;
