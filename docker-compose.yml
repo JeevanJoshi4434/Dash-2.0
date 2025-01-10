@@ -1,0 +1,44 @@
+services:
+  app:
+    build:
+      context: ./apps/Frontend
+    container_name: app
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+    depends_on:
+      - nodejs
+      - python
+
+  db:
+    image: mongo:latest
+    container_name: db
+    ports:
+      - "27018:27017"
+    volumes:
+      - ./tmp/db:/data/db
+
+  nodejs:
+    build:
+      context: ./apps/Backend/NodeJs
+    container_name: nodejs
+    environment:
+      - MONGO_URI = "mongodb://db:27018/farm" 
+      - PORT="3001" 
+      - JWT_SECRET="farm$farm" 
+      - NODE_ENV="production" 
+      - SALT="10"
+    ports:
+      - "3001:3001"
+    volumes:
+      - .:/node_server
+
+  pythonserver:
+    build:
+      context: ./apps/Backend/Python
+    container_name: pythonserver
+    ports:
+      - "3002:3002"
+    volumes:
+      - .:/python_server
