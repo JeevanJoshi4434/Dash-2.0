@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "predict_bidding",
+    "rest_framework",
+    "drf_yasg",
 ]
 
 MIDDLEWARE = [

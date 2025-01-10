@@ -1,3 +1,6 @@
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 import os
 import pickle
 import numpy as np
@@ -5,6 +8,7 @@ import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
+from predict_bidding.serializer import BiddingInputSerializer
 
 # Construct the full path to the pickle file
 models_file_path = os.path.join(
@@ -55,3 +59,43 @@ def predict_bid(request):
             return JsonResponse({"error": str(e)}, status=400)
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+class PredictBidAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        return Response(
+            {"message": "This endpoint supports POST for predictions."},
+            status=status.HTTP_200_OK,
+        )
+
+    def post(self, request, *args, **kwargs):
+        # Validate the input data
+        serializer = BiddingInputSerializer(data=request.data)
+        if serializer.is_valid():
+            data = serializer.validated_data
+
+            # Prepare features for prediction
+            features = np.array(
+                [
+                    [
+                        data["average_price"],
+                        data["temperature"],
+                        data["rainfall"],
+                        data["sales_prediction"],
+                        data["other_features"],
+                    ]
+                ]
+            )
+
+            # Perform prediction
+            try:
+                predicted_bid = model.predict(features)[0]
+                return Response(
+                    {"predicted_bid_price": predicted_bid}, status=status.HTTP_200_OK
+                )
+            except Exception as e:
+                return Response(
+                    {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
